@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       - SERVER_PORT=${PORT:-8080}
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/typingrace?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/typingrace?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=typingrace
       - SPRING_DATASOURCE_PASSWORD=typingrace
       - SPRING_DATA_REDIS_HOST=redis
