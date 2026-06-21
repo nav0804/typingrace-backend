@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build the Application
 # ==========================================
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
 # Copy the pom.xml and download dependencies first (caches them for faster builds)
@@ -16,7 +16,7 @@ RUN mvn clean package -DskipTests
 # Stage 2: Run the Application
 # ==========================================
 # Note: Change '17' to '21' if you are using Java 21
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copy the built jar from the previous stage
