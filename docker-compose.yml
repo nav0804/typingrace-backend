@@ -1,21 +1,39 @@
 services:
+  # 1. Your Spring Boot Backend
+  backend:
+    build: .
+    restart: unless-stopped
+    environment:
+      # Railway sets the PORT dynamically, but Spring needs to know to use it
+      - SERVER_PORT=${PORT:-8080}
+
+      # Tell Spring Boot to look for the other containers by their service names
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    depends_on:
+      - redis
+      - kafka
+
+  # 2. Redis Source of Truth
   redis:
     image: redis:7-alpine
-    container_name: typing-race-redis
-    ports:
-      - "6379:6379"
     restart: unless-stopped
+    # No exposed ports needed; the backend connects internally via 'redis:6379'
 
+  # 3. Kafka Broadcaster
   kafka:
     image: apache/kafka:3.7.0
-    container_name: typing-race-kafka
-    ports:
-      - "9092:9092"
+    restart: unless-stopped
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
+      # Listen internally on all interfaces
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # VERY IMPORTANT: Advertise the internal service name 'kafka' so Spring Boot can route to it
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
@@ -23,4 +41,3 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       CLUSTER_ID: 'Jg0Q5xZ1Q-mU9Q_V1M0w1A'
-    restart: unless-stopped
