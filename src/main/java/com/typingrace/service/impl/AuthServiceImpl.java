@@ -1,9 +1,11 @@
 package com.typingrace.service.impl;
 
+import com.typingrace.domain.entity.Profile;
 import com.typingrace.domain.entity.User;
 import com.typingrace.dto.request.LoginRequest;
 import com.typingrace.dto.request.RegisterRequest;
 import com.typingrace.dto.response.JwtResponse;
+import com.typingrace.repository.ProfileRepository;
 import com.typingrace.repository.UserRepository;
 import com.typingrace.service.AuthService;
 import com.typingrace.util.JwtUtils;
@@ -23,13 +25,16 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private  final JwtUtils jwtUtils;
+    private final ProfileRepository profileRepository;
 
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+                           AuthenticationManager authenticationManager, JwtUtils jwtUtils,
+                           ProfileRepository profileRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.profileRepository = profileRepository;
     }
 
     @Override
@@ -43,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User newUser = new User();
+        Profile newProfile = new Profile();
         newUser.setName(registerRequest.getName());
         newUser.setUsername(registerRequest.getUsername());
         newUser.setEmail(registerRequest.getEmail());
@@ -53,7 +59,11 @@ public class AuthServiceImpl implements AuthService {
         newUser.setIsVerified(false); // Can be verified later via email link
         newUser.setLastLogin(null);
 
-        userRepository.save(newUser);
+        User saved = userRepository.save(newUser);
+
+        newProfile.setName(saved.getName());
+        newProfile.setUser(saved);
+        profileRepository.save(newProfile);
         return "User registered successfully!";
     }
 
