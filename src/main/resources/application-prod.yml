@@ -32,7 +32,9 @@ spring:
 
   data:
     redis:
-      url: ${SPRING_REDIS_URL}
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD}
 
 # Cloud Dynamic Port Routing
 server:
