@@ -43,3 +43,4 @@ server:
 logging:
   level:
     org.springframework.security: INFO
+    org.apache.kafka: WARN
