@@ -32,8 +32,8 @@ spring:
 
   data:
     redis:
-      host: ${SPRING_REDIS_HOST}
-      port: ${SPRING_REDIS_PORT}
+      host: ${REDISHOST:localhost}
+      port: ${REDISPORT:6379}
 
 # Cloud Dynamic Port Routing
 server:
